@@ -27,11 +27,11 @@ dater <- "230724"
 datt <- "230905"
 
 # set path in which to save output subdirectories
-output_dir_core <- "~/Documents/scripts/global_amphibian_chytrid_declines_2023/outputs/"
+output_dir_core <- "~/Documents/scripts/2023_global_amphibian_chytrid_declines/outputs/"
 
 # path to scripts and data
-scripts_path <- "~/Documents/scripts/global_amphibian_chytrid_declines_2023/" 
-data_path <- "~/Documents/scripts/global_amphibian_chytrid_declines_2023/data/" 
+scripts_path <- "~/Documents/scripts/2023_global_amphibian_chytrid_declines/" 
+data_path <- "~/Documents/scripts/2023_global_amphibian_chytrid_declines/data/" 
 
 library("ape")
 phylo <- read.nexus(paste0(data_path, "amphibia_nexus_spp.txt"))
