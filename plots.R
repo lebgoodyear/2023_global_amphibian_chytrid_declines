@@ -6,21 +6,12 @@
 
 # Author: Luke Goodyear (lgoodyear01@qub.ac.uk)
 # Date created: Jan 2023
-# Last edited: Sep 2023
-
-
-# clear workspace
-rm(list=ls())
+# Last edited: Jan 2024
 
 
 ############################################################################
 ############################### Set up #####################################
 
-
-# date corresponding to dataset
-dater <- "230724"
-# date corresponding to today (day of running)
-datt <- "230905"
 
 # load packages
 library("tidyr")
@@ -34,18 +25,8 @@ theme_update(axis.line = element_line(colour = "black"),
              panel.border = element_blank(),
              panel.background = element_blank()) 
 
-# load data
-data <- read.csv(paste0("~/Documents/scripts/global_amphibian_chytrid_declines_2023/data_full/iucn_olson_dataset_", dater, ".csv"))
-
-# set path for outputs
-path_outputs <- "~/Documents/scripts/global_amphibian_chytrid_declines_2023/outputs/"
-
-# check if results directory exists and if not, create it
-ifelse(!dir.exists(file.path(paste0(path_outputs, "/", datt, "/"))), 
-       dir.create(file.path(paste0(path_outputs, "/", datt, "/"))), 
-       FALSE)
 # set new output path by date of running
-path_out <- paste0(path_outputs, "/", datt, "/")
+path_plots <- path_base
 
 
 ############################################################################
@@ -55,7 +36,7 @@ path_out <- paste0(path_outputs, "/", datt, "/")
 # set categories of interest (VU, EN, CR)
 cats <- c(3,4,5)
 # set categories to remove (EW, EX)
-to_remove <- c(6,7)
+to_remove <- c(NA,6,7)
 
 # create function to prep data to plot for each time period
 prep <- function(df, bd) {
@@ -65,11 +46,11 @@ prep <- function(df, bd) {
     df1980 <- df
   }
   if (bd==1) {
-    df1980 <- df[which(df$Bd1980 == 1),]
+    df1980 <- df1980[which(df1980$Bd1980 == 1),]
   }
   df1980p <- df1980 %>% 
     group_by(RL1980) %>%
-    summarise(n=sum(RL1980))
+    summarise(n=n())
   df1980p$prop <- df1980p$n/sum(na.omit(df1980p$n))
   
   if(length(which(df$RL2004 %in% to_remove))!=0){
@@ -78,11 +59,11 @@ prep <- function(df, bd) {
     df2004 <- df
   }
   if (bd==1) {
-    df2004 <- df[which(df$Bd2004 == 1),]
+    df2004 <- df2004[which(df2004$Bd2004 == 1),]
   }
   df2004p <- df2004 %>% 
     group_by(RL2004) %>%
-    summarise(n=sum(RL2004))
+    summarise(n=n())
   df2004p$prop <- df2004p$n/sum(na.omit(df2004p$n))
   
   if(length(which(df$RL2020 %in% to_remove))!=0){
@@ -91,13 +72,17 @@ prep <- function(df, bd) {
     df2020 <- df
   }
   if (bd==1) {
-    df2020 <- df[which(df$Bd2020 == 1),]
+    df2020 <- df2020[which(df2020$Bd2020 == 1),]
   }
   df2020p <- df2020 %>% 
     group_by(RL2020) %>%
-    summarise(n=sum(RL2020))
+    summarise(n=n())
   df2020p$prop <- df2020p$n/sum(na.omit(df2020p$n))
   
+  # count number of samples in each year grouping
+  count_comparison <- c(nrow(df1980), nrow(df2004), nrow(df2020))
+  
+  # table of bd positive and threatened status
   
   to_plot <- data.frame(matrix(nrow=3, ncol=6))
   names(to_plot) <- c("Year", "LC", "NT", "VU", "EN", "CR")
@@ -117,11 +102,11 @@ prep <- function(df, bd) {
   
   dat_prop <- melt(to_plot_prop, na.rm = FALSE, id = "Year")
   
-  return(list(dat, dat_prop))
+  return(list(dat, dat_prop, count_comparison, df2004p))
 }
 
 # plot all species
-dfall <- prep(data, bd=0) # doesn't matter what bd is set to in this case
+dfall <- prep(df, bd=0) # doesn't matter what bd is set to in this case
 allplot <- ggplot(data=dfall[[2]], aes(x=Year, y=value)) +
             geom_smooth(aes(color=variable)) +
             scale_color_manual(values=c("#003C86", "#3487A5", "#12BFA2", "#E8D91C", "#DA4409")) +
@@ -131,7 +116,7 @@ allplot <- ggplot(data=dfall[[2]], aes(x=Year, y=value)) +
                   legend.text = element_text(size = 10))
 
 # plot Bd positive only species
-dfbd <- prep(data, bd=1) # set bd to one for only bd positive species
+dfbd <- prep(df, bd=1) # set bd to one for only bd positive species
 bdplot <- ggplot(data=dfbd[[2]], aes(x=Year, y=value)) +
             geom_smooth(aes(color=variable)) +
             scale_color_manual(values=c("#003C86", "#3487A5", "#12BFA2", "#E8D91C", "#DA4409")) +
@@ -141,8 +126,12 @@ bdplot <- ggplot(data=dfbd[[2]], aes(x=Year, y=value)) +
                   legend.text = element_text(size = 10))
 
 # save both plots
-ggsave(paste0(path_out, "rlcats_1980-2020.png"), allplot)
-ggsave(paste0(path_out, "bdrlcats_1980-2020.png"), bdplot)
+ggsave(paste0(path_plots, "rlcats_1980-2020.png"), allplot)
+ggsave(paste0(path_plots, "bdrlcats_1980-2020.png"), bdplot)
+
+# save breakdown
+write.csv(as.data.frame(dfall[[1]]), paste0(path_plots, "category_breakdowns_over_time.csv"))
+write.csv(as.data.frame(dfbd[[1]]), paste0(path_plots, "category_bdpos_breakdowns_over_time.csv"))
 
 
 ############################################################################
@@ -192,7 +181,7 @@ plot_pies <- function(pie, col_name, property, labs) {
           legend.key = element_rect(fill = "white", colour = "#000000", linewidth=0.02)) +
     guides(fill = guide_legend(nrow = length(labs), byrow = TRUE)) # set space between legend items
   # save pie
-  ggsave(file=paste0(path_out,col_name, "_pie_plot.png"), 
+  ggsave(file=paste0(path_plots,col_name, "_pie_plot.png"), 
          width=210, height=297, units="mm", 
          pie_out)
   
@@ -204,12 +193,12 @@ plot_pies <- function(pie, col_name, property, labs) {
 ############################ Plot pie charts ###############################
 
 
-df <- data # copy data since changes are made directly to column values
+dfa <- df # copy data since changes are made directly to column values
 colours = c("#FF5608", "#0037a6", "#ffffff")#c("#000000", "#ffffff", "#8aa1a4") # set colours for plots
 
 
 # split data by order and save as pie chart
-pie_order <- as.data.frame(table(df$Order))
+pie_order <- as.data.frame(table(dfa$Order))
 names(pie_order) <- c("Order", "Frequency")
 # set order of groups in pie chart plot
 pie_order$Order <- factor(pie_order$Order, levels=c("Anura", "Caudata", "Gymnophiona"))
@@ -218,41 +207,44 @@ order_plot
 
 
 # split data by Bd and save as pie chart
-pie_bd2020 <- as.data.frame(table(df$Bd2020))
+pie_bd2020 <- as.data.frame(table(dfa$Bd2020))
 names(pie_bd2020) <- c("Bd2020", "Frequency")
 # set order of groups in pie chart plot
 pie_bd2020$Bd2020 <- factor(pie_bd2020$Bd2020, levels=c("1", "0"))
 bd_plot2020 <- plot_pies(pie_bd2020, "Test Results for Bd (2020)", "Bd2020", c("Bd detected", "Bd not detected"))
 bd_plot2020
+write.csv(pie_bd2020, paste0(path_plots, "Test Results for Bd (2020).csv"))
 
 
 # split data by Bd and save as pie chart
 # set NAs to 'No data' so they plot on pie chart
-df$Bd2004[which(is.na(df$Bd2004))] <- "No data"
-pie_bd2004 <- as.data.frame(table(df$Bd2004))
+dfa$Bd2004[which(is.na(dfa$Bd2004))] <- "No data"
+pie_bd2004 <- as.data.frame(table(dfa$Bd2004))
 names(pie_bd2004) <- c("Bd2004", "Frequency")
 # set order of groups in pie chart plot
 pie_bd2004$Bd2004 <- factor(pie_bd2004$Bd2004, levels=c("1", "0", "No data"))
 bd_plot2004 <- plot_pies(pie_bd2004, "Test Results for Bd (2004)", "Bd2004", c("Bd detected", "Bd not detected", "No data"))
 bd_plot2004
+write.csv(pie_bd2004, paste0(path_plots, "Test Results for Bd (2004).csv"))
 
 
 # split data by Bd and save as pie chart
 # set NAs to 'No data' so they plot on pie chart
-df$Bd1980[which(is.na(df$Bd1980))] <- "No data"
-pie_bd1980 <- as.data.frame(table(df$Bd1980))
+dfa$Bd1980[which(is.na(dfa$Bd1980))] <- "No data"
+pie_bd1980 <- as.data.frame(table(dfa$Bd1980))
 names(pie_bd1980) <- c("Bd1980", "Frequency")
 # set order of groups in pie chart plot
 pie_bd1980$Bd1980 <- factor(pie_bd1980$Bd1980, levels=c("1", "0", "No data"))
 bd_plot1980 <- plot_pies(pie_bd1980, "Test Results for Bd (1980)", "Bd1980", c("Bd detected", "Bd not detected", "No data"))
 bd_plot1980
+write.csv(pie_bd1980, paste0(path_plots, "Test Results for Bd (1980).csv"))
 
 
 # split data by IUCN declines and save as pie chart
 # set NAs to 'No data' so they plot on pie chart
-df$PopTrend2020[which(is.na(df$PopTrend2020))] <- "No data"
-df$PopTrend2020[which(df$PopTrend2020 == 1)] <- 0
-pie_pop <- as.data.frame(table(df$PopTrend2020))
+dfa$PopTrend2020[which(is.na(dfa$PopTrend2020))] <- "No data"
+dfa$PopTrend2020[which(dfa$PopTrend2020 == 1)] <- 0
+pie_pop <- as.data.frame(table(dfa$PopTrend2020))
 names(pie_pop) <- c("PopTrend", "Frequency")
 # set order of groups in pie chart plot
 pie_pop$PopTrend <- factor(pie_pop$PopTrend, levels=c("-1", "0", "No data"))
@@ -262,8 +254,8 @@ pop_plot
 
 # split data by IUCN category worsening 1980-2004 and save as pie chart
 # set NAs to 'No data' so they plot on pie chart
-df$StatusChangeRL1980to2004[which(is.na(df$StatusChangeRL1980to2004))] <- "No data"
-pie_19802004 <- as.data.frame(table(df$StatusChangeRL1980to2004))
+dfa$StatusChangeRL1980to2004[which(is.na(dfa$StatusChangeRL1980to2004))] <- "No data"
+pie_19802004 <- as.data.frame(table(dfa$StatusChangeRL1980to2004))
 names(pie_19802004) <- c("Statx", "Frequency")
 # set order of groups in pie chart plot
 pie_19802004$Statx <- factor(pie_19802004$Statx, levels=c("1", "0", "No data"))
@@ -272,8 +264,12 @@ s19802004_plot
 
 
 # split data by IUCN category worsening 2004-2020 and save as pie chart
-# remove species that remained extinct between 2004 and 2020 (EX includes EX and EW)
-df20042020 <- df[-which(df$StatusChangeRL2004to2020 == "EX"),]
+# remove species that remained extinct between 2004 and 2020 (EX has been coded to include EX and EW)
+if (length(which(dfa$StatusChangeRL2004to2020 == "EX")) != 0) {
+  df20042020 <- dfa[-which(dfa$StatusChangeRL2004to2020 == "EX"),]
+} else {
+  df20042020 <- dfa
+}
 df20042020$StatusChangeRL2004to2020[which(is.na(df20042020$StatusChangeRL2004to2020))] <- "No data"
 pie_20042020 <- as.data.frame(table(df20042020$StatusChangeRL2004to2020))
 names(pie_20042020) <- c("Statx", "Frequency")
@@ -284,7 +280,7 @@ s20042020_plot
 
 
 # split data by IUCN threatened category 2004 and save as pie chart
-dfrl2004 <- data
+dfrl2004 <- df
 # remove extinct species
 dfrl2004 <- dfrl2004[!(dfrl2004$RL2004 %in% to_remove),]
 # group by threatened and non-threatened categories
@@ -307,7 +303,7 @@ RL2004_plot
 
 
 # split data by IUCN threatened category 2020 and save as pie chart
-dfrl2020 <- data
+dfrl2020 <- df
 # remove extinct species
 dfrl2020 <- dfrl2020[!(dfrl2020$RL2020 %in% to_remove),]
 # group by threatened and non-threatened categories
