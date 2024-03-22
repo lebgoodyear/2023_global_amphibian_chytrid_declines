@@ -22,7 +22,7 @@ if (!is.na(sub)){
   if (sub == "sampling_biases") {
     # read in different dataset corresponding to splitting the dataset by year 
     # (partitioning data completely by time, i.e. not cumulative)
-    df <- read.csv(paste0(data_path, "iucn_olson_dataset_", dater, "_sampling_biases.csv"))
+    df <- read.csv(paste0(data_path, "iucn_olson_dataset_231123_sampling_biases.csv"))
   }
   
   
