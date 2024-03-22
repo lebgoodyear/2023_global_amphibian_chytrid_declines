@@ -59,7 +59,8 @@ if (calc_phylo == 1) {
             data = dat_brms, 
             family = bernoulli(), 
             data2 = list(A = A),
-            prior = priors1)
+            prior = priors1,
+            iter = iter_phylo)
   # view model
   summary(mod1)
   # save model
@@ -83,7 +84,8 @@ if (calc_bay_log == 1) {
   mod2 <- brm(varr ~ 1 + varp, 
               data = dat_brms, 
               family = bernoulli(), 
-              prior = priors2)
+              prior = priors2,
+              iter = iter_log)
   # view model
   summary(mod2)
   # save model
