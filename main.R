@@ -12,11 +12,6 @@
 ############################# Run set up script ################################
 
 
-# this script formats the user input variables for the main script
-# by subsetting dataset by specified variables and creating output directories
-print("Running set up script...")
-source(paste0(scripts_path, "analysis_prep.R"))
-
 # stop Rplots.pdf from being automatically produced when run on command line
 pdf(NULL)
 
