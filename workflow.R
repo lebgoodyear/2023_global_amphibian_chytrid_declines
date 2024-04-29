@@ -5,7 +5,7 @@
 
 # Author: Luke Goodyear (lgoodyear01@qub.ac.uk)
 # Date created: Dec 2022
-# Last edited: Mar 2024
+# Last edited: Apr 2024
 
 # clear workspace
 rm(list=ls())
@@ -25,7 +25,7 @@ print("Reading in user inputs...")
 dater <- "240117" #"231123" #"230724" # note that sampling bias analysis will always 
 # run on 231123, regardless of dater value
 # date corresponding to today (day of running)
-datt <- "240317" #240208" #231123a"#"230905"
+datt <- "240429" #240208" #231123a"#"230905"
 
 # set path in which to save output subdirectories
 output_dir_core <- paste0("~/Documents/scripts/2023_global_amphibian_chytrid_declines/outputs/", datt,"/")
@@ -69,18 +69,24 @@ sub <- NA#"temperate"
 
 # UNIVARIATE ANALYSIS
 # set to 1 to run, 0 to not run
+
+# FREQUENTIST
 # plot mosaics for chosen variable?
 plot_mosaics <- 1
 # calculate chi-squared and related phi correlation coefficient?
 calc_chi_phi <- 1
 # run frequentist logistic regression model?
 calc_freq_log <- 1
+
+# BAYESIAN
+# set number of cores for Bayesian models (how many cores does your computer have?)
+num_cores <- 4
 # run Bayesian logsitic regression model?
 calc_bay_log <- 1
 # set iterations
-iter_log <- 10000
+iter_log <- 5000
 # run model controlling for phlogeny?
-calc_phylo <- 0
+calc_phylo <- 1
 # set iterations
 iter_phylo <- 5000
 
@@ -113,12 +119,12 @@ if (length(args) > 0) { # check to see if running from command line
 to_remover <- c("EW","EX")
 # c("EX") to remove stable extinct for category change
 # c("EW","EX") to remove extinct and extinct in wild for category
-# NA for pop trend
+# empty vector c() for pop trend
 # then specify variable of interest so that new binary column will be 'yes' (1) if 
 # equal to this variable and 'no' (0) otherwise (this variable is ignored if 
 # column is already binary)
 varr_int <- c(3,4,5)
-# NA for status change
+# empty vector c() for status change
 # c(3,4,5) for category
 # -1 for decreasing variable for population trend
 # name of new binary colunn
@@ -197,12 +203,12 @@ print("Running set up script...")
 source(paste0(scripts_path, "analysis_prep.R"))
        
 print("Running main script...")
-# run script with all base stats
+# run script with frequentist stats
 source(paste0(scripts_path, "main.R"))
 
 print("Running phylogeny-specific script...")
-# run script with all methods of controlling for phylogeny
-source(paste0(scripts_path, "main_phylo.R"))
+# run script with bayes models
+source(paste0(scripts_path, "main_bayes.R"))
 
 
 print("Script finished.")
