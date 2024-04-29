@@ -31,6 +31,10 @@ saveRDS(datls, paste0(path_out, varr, "_", varp, "_data.rds"))
 traits <- datls[[1]] # first list object is dataset
 phylo <- datls[[2]] # second list object is phylogeny
 
+# split traits and phylogeny
+dat_brms <- as.data.frame(cbind(traits$PhyloName, traits[[varr]], traits[[varp]]))
+names(dat_brms) <- c("PhyloName", "varr", "varp")
+
 
 ################################################################################
 ################################### brms #######################################
@@ -78,10 +82,6 @@ A <- ape::vcv.phylo(phylo)
 
 # scale to create correlation matrix to improve convergence
 A <- vcv.phylo(phylo,corr=TRUE)
-
-# split traits and phylogeny
-dat_brms <- as.data.frame(cbind(traits$PhyloName, traits[[varr]], traits[[varp]]))
-names(dat_brms) <- c("PhyloName", "varr", "varp")
 
 # model with response, predictor, phylogeny and intercept
 # get priors
