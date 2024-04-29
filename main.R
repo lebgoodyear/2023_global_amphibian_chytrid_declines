@@ -5,11 +5,11 @@
 
 # Author: Luke Goodyear (lgoodyear01@qub.ac.uk)
 # Date created: Dec 2022
-# Last edited: Sep 2023
+# Last edited: Apr 2024
 
 
 ################################################################################
-############################# Run set up script ################################
+################################## Set up ######################################
 
 
 # stop Rplots.pdf from being automatically produced when run on command line
@@ -101,4 +101,4 @@ if (calc_freq_log == 1) {
 print("Script completed")
 
 
-# end of script
+## end of script
