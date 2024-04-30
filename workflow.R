@@ -48,9 +48,9 @@ df <- read.csv(paste0(data_path, "iucn_olson_dataset_", dater, "_full.csv"))
 ## note the following variables will be overwritten if running from commandline
 
 # select response variable by column name in dataframe
-resp <- "RL1980" # or "StatusChangeRL2004to2020" or "PopTrend2020" for example
+resp <- "RL2004" # or "StatusChangeRL2004to2020"
 # select predictor variable by column name in dataframe
-pred <- "Bd1980"
+pred <- "Bd2004"
 # note that if the response includes a date or date range and we are using
 # Bd as the predictor, the date of Bd must match the date (or final date if range)
 
@@ -119,19 +119,16 @@ if (length(args) > 0) { # check to see if running from command line
 to_remover <- c("EW","EX")
 # c("EX") to remove stable extinct for category change
 # c("EW","EX") to remove extinct and extinct in wild for category
-# empty vector c() for pop trend
 # then specify variable of interest so that new binary column will be 'yes' (1) if 
 # equal to this variable and 'no' (0) otherwise (this variable is ignored if 
 # column is already binary)
 varr_int <- c(3,4,5)
 # empty vector c() for status change
 # c(3,4,5) for category
-# -1 for decreasing variable for population trend
 # name of new binary colunn
-varr <- "Threatened1980"
+varr <- "Threatened2004"
 # NA for category change 
 # "Threatened2020" for category
-# "PopDecreasing2020" for pop trend
 # if response column is already binary column, set variable to equal column name
 if (is.na(varr)) {
   varr <- resp  
@@ -139,9 +136,9 @@ if (is.na(varr)) {
 
 # for contingency tables and mosaic plots
 # names for response labels
-key_name <- "Threatened status" #"Category worsened" #"Threatened status" #"Population trend"
-varr_int_name <- "Threatened"  #"Worsened" #"Threatened" # "Declining" corresponding to 1 factor level
-varr_other_name <- "Not threatened" # "Stable/increasing" #"Not threatened" # "Stable/increasing" corresponding to 0 factor level
+key_name <- "Threatened status" #"Category worsened" #"Threatened status"
+varr_int_name <- "Threatened"  #"Worsened" #"Threatened" corresponding to 1 factor level
+varr_other_name <- "Not threatened" # "Stable/increasing" #"Not threatened" corresponding to 0 factor level
 
 # set predictor equal to variable varp
 varp <- pred
@@ -195,7 +192,7 @@ if (!is.na(sub)) {
 
 print("Running plots script...")
 # run script to plot line graphs and pie charts
-source(paste0(scripts_path, "plots.R"))
+#source(paste0(scripts_path, "plots.R"))
 
 # this script formats the user input variables for the main script
 # by subsetting dataset by specified variables and creating output directories
