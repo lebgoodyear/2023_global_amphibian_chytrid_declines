@@ -47,20 +47,21 @@ df <- read.csv(paste0(data_path, "iucn_olson_dataset_", dater, "_full.csv"))
 
 ## note the following variables will be overwritten if running from commandline
 
-# select response variable by column name in dataframe
-resp <- "RL2004" # or "StatusChangeRL2004to2020"
-# select predictor variable by column name in dataframe
-pred <- "Bd2004"
-# note that if the response includes a date or date range and we are using
-# Bd as the predictor, the date of Bd must match the date (or final date if range)
+# select response variable by column name in dataframe, one of:
+# (1) RL2004
+# (2) RL2020
+# (3) StatusChangeRL1980to2004
+# (4) StatusChangeRL2004to2020
+resp <- "StatusChangeRL2004to2020"
+# note that correct year of Bd predictor is chosen automatically
 
-# select if subset is being run
+# select one of the following if subset is being run
 # (1) NA to run full dataset
 # (2) "sampling_biases"
 # (3) "tropical"
 # (4) "temperate"
 # (5) "species_continuity"
-sub <- NA#"temperate"
+sub <- "temperate"
 
 ## end of command line variables
 
@@ -81,7 +82,7 @@ calc_freq_log <- 1
 # BAYESIAN
 # set number of cores for Bayesian models (how many cores does your computer have?)
 num_cores <- 4
-# run Bayesian logsitic regression model?
+# run Bayesian logisitic regression model?
 calc_bay_log <- 1
 # set iterations
 iter_log <- 5000
@@ -96,7 +97,7 @@ iter_phylo <- 5000
 
 # if running from command line, this will overwrite area, var and date variables
 # run from the command line locally using:
-# Rscript --vanilla workflow.R "RL2004" "Bd2004" "tropical"
+# Rscript --vanilla workflow.R "RL2004" "tropical"
 # import command line arguments
 #!/usr/bin/env Rscript
 # set up to accept arguments from command
@@ -104,9 +105,8 @@ iter_phylo <- 5000
 args <- commandArgs(trailingOnly=TRUE)
 # load arguments into script as required variable names
 if (length(args) > 0) { # check to see if running from command line
-  varr <- args[1]
-  varp <- args[2]
-  sub <- args[3]
+  resp <- args[1]
+  sub <- args[2]
 } 
 
 
@@ -114,34 +114,62 @@ if (length(args) > 0) { # check to see if running from command line
 ####################### OPTIONAL: Advanced variables ###########################
 
 
-# if response has multiple categories (is not 1/0 binary)
-# first set any unwanted/undefined variables to be removed (otherwise set to NA)
-to_remover <- c("EW","EX")
-# c("EX") to remove stable extinct for category change
-# c("EW","EX") to remove extinct and extinct in wild for category
-# then specify variable of interest so that new binary column will be 'yes' (1) if 
-# equal to this variable and 'no' (0) otherwise (this variable is ignored if 
-# column is already binary)
-varr_int <- c(3,4,5)
-# empty vector c() for status change
-# c(3,4,5) for category
-# name of new binary colunn
-varr <- "Threatened2004"
-# NA for category change 
-# "Threatened2020" for category
-# if response column is already binary column, set variable to equal column name
-if (is.na(varr)) {
-  varr <- resp  
+# these variables are automatically set up but can be changed manually if required
+
+
+# settings for variable groups
+if (resp %in% c("RL2004", "RL2020")) {
+  # set any unwanted/undefined variables to be removed
+  to_remover <- c("EW","EX") # remove extinct and extinct in wild
+  # specify variable/s of interest, varr_int, so that new binary column will be 
+  # 'yes' (1) if equal to this variable/s and 'no' (0) otherwise
+  varr_int <- c(3,4,5)
+  # for contingency tables and mosaic plots
+  # names for response labels
+  key_name <- "Threatened status" 
+  varr_int_name <- "Threatened"  # corresponding to 1 factor level
+  varr_other_name <- "Not threatened" # corresponding to 0 factor level
+} else if (resp %in% c("StatusChangeRL1980to2004", "StatusChangeRL2004to2020")) {
+  # set any unwanted/undefined variables to be removed
+  to_remover <- c("EX") # remove stable extinct for category change
+  # resp is already a binary column so we do not need to specify
+  # the variables of interest
+  varr_int <- NULL 
+  # for contingency tables and mosaic plots
+  # names for response labels
+  key_name <- "Category worsened"
+  varr_int_name <- "Worsened"  # corresponding to 1 factor level
+  varr_other_name <- "Stable/increasing" # corresponding to 0 factor level
+} else {
+  stop("Response variable name (resp) contains an error. It must be one of: 
+        RL2004, RL2020, StatusChangeRL1980to2004, StatusChangeRL2004to2020")
 }
 
-# for contingency tables and mosaic plots
-# names for response labels
-key_name <- "Threatened status" #"Category worsened" #"Threatened status"
-varr_int_name <- "Threatened"  #"Worsened" #"Threatened" corresponding to 1 factor level
-varr_other_name <- "Not threatened" # "Stable/increasing" #"Not threatened" corresponding to 0 factor level
 
-# set predictor equal to variable varp
-varp <- pred
+# settings for individual response variables
+if (resp == "RL2004") {
+  # name of new binary column 
+  varr <- "Threatened2004"
+  # set predictor column to Bd detections for correct year (matching response)
+  varp <- "Bd2004"
+}
+if (resp == "RL2020") {
+  # name of new binary column 
+  varr <- "Threatened2020"
+  # set predictor column to Bd detections for correct year (matching response)
+  varp <- "Bd2020"
+}
+if (resp == "StatusChangeRL1980to2004") {
+  varr <- resp # resp is already binary column
+  # set predictor column to Bd detections for correct year (matching response)
+  varp <- "Bd2004"
+}
+if (resp == "StatusChangeRL2004to2020") {
+  varr <- resp # resp is already a binary column
+  # set predictor column to Bd detections for correct year (matching response)
+  varp <- "Bd2020"
+}
+
 
 # for contingency tables and mosaic plots
 # names for predictor labels
@@ -162,7 +190,7 @@ set.seed(26)
 
 
 print("Running subsetting script...")
-# run plot to subset data as needed
+# run to subset data as required
 source(paste0(scripts_path, "subsetting.R"))
 
 
@@ -172,17 +200,17 @@ source(paste0(scripts_path, "subsetting.R"))
 
 # check if results directory exists and if not, create it
 if (!is.na(sub)) {
-  ifelse(!dir.exists(file.path(paste0(output_dir_core, sub, "/", resp, "_", pred, "/"))),
-         dir.create(file.path(paste0(output_dir_core, sub, "/", resp, "_", pred, "/")), recursive=T), 
+  ifelse(!dir.exists(file.path(paste0(output_dir_core, sub, "/", resp, "_", varp, "/"))),
+         dir.create(file.path(paste0(output_dir_core, sub, "/", resp, "_", varp, "/")), recursive=T), 
          FALSE)
   path_base <- paste0(output_dir_core, sub, "/")
-  path_out <- paste0(path_base, resp, "_", pred, "/")
+  path_out <- paste0(path_base, resp, "_", varp, "/")
 } else {
-  ifelse(!dir.exists(file.path(paste0(output_dir_core, resp, "_", pred, "/"))), 
-         dir.create(file.path(paste0(output_dir_core, resp, "_", pred, "/")), recursive=T), 
+  ifelse(!dir.exists(file.path(paste0(output_dir_core, resp, "_", varp, "/"))), 
+         dir.create(file.path(paste0(output_dir_core, resp, "_", varp, "/")), recursive=T), 
          FALSE)
   path_base <- paste0(output_dir_core)
-  path_out <- paste0(path_base, resp, "_", pred, "/")
+  path_out <- paste0(path_base, resp, "_", varp, "/")
 }
 
 

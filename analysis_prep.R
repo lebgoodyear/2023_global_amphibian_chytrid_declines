@@ -21,7 +21,7 @@ source(paste0(scripts_path, "functions.R"))
 
 
 print("Removing NAs from dataset...")
-df <- df[!is.na(df[[pred]]),]
+df <- df[!is.na(df[[varp]]),]
 df <- df[!is.na(df[[resp]]),]
 
 # if response column is not already a binary column, convert it to one
@@ -37,13 +37,13 @@ if (length(setdiff(df[[resp]], c(0, 1))) != 0) {
 }
 
 # if predictor column is not already a binary column, convert it to one
-if (length(setdiff(df[[pred]], c(0, 1))) != 0) {
+if (length(setdiff(df[[varp]], c(0, 1))) != 0) {
   if (!is.null(to_removep)) {
     print("Removing undesginated entries from predictor...")
-    df <- df[!(df[[pred]] %in% to_removep),]
+    df <- df[!(df[[varp]] %in% to_removep),]
   }
   print("Setting up new binary column variable for predictor...")
-  df <- make_new_col(df, varp, pred, varp_int)
+  df <- make_new_col(df, varp, varp, varp_int)
 }
 
 # make sure both columns are numeric
