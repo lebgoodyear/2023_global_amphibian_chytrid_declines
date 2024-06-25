@@ -69,7 +69,7 @@ if (calc_bay_log == 1) {
   hist(mod1[["fit"]]@sim[["samples"]][[1]][["b_varp1"]], breaks=50)
   dev.off()
   pdf(file=paste0(path_out, "fixed_postdis_plots.pdf"))
-  plot(mod1)
+  plot(mod1, theme=theme_bw())
   dev.off()
 }
 
@@ -112,7 +112,7 @@ if (calc_phylo == 1) {
   hist(mod2[["fit"]]@sim[["samples"]][[1]][["b_varp1"]], breaks=50)
   dev.off()
   pdf(file=paste0(path_out, "phylo_fixed_postdis_plots.pdf"))
-  plot(mod2)
+  plot(mod2, theme=theme_bw())
   dev.off()
 }
 
