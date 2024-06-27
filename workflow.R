@@ -5,7 +5,7 @@
 
 # Author: Luke Goodyear (lgoodyear01@qub.ac.uk)
 # Date created: Dec 2022
-# Last edited: Apr 2024
+# Last edited: Jun 2024
 
 # clear workspace
 rm(list=ls())
@@ -22,10 +22,10 @@ print("Reading in user inputs...")
 
 
 ## date corresponding to dataset
-dater <- "240117" #"231123" #"230724" # note that sampling bias analysis will always 
+dater <- "240117" # note that sampling bias analysis will always 
 # run on 231123, regardless of dater value
 # date corresponding to today (day of running)
-datt <- "240625a" #"240429"
+datt <- "240625" #"240429"
 
 # set path in which to save output subdirectories
 output_dir_core <- paste0("~/Documents/scripts/2023_global_amphibian_chytrid_declines/outputs/", datt,"/")
@@ -52,20 +52,20 @@ df <- read.csv(paste0(data_path, "iucn_olson_dataset_", dater, "_full.csv"))
 # (2) RL2020
 # (3) StatusChangeRL1980to2004
 # (4) StatusChangeRL2004to2020
-resp <- "StatusChangeRL2004to2020"
+resp <- "RL2004"
 # note that correct year of Bd predictor is chosen automatically
 
 # select one of the following if subset is being run
 # (1) NA to run full dataset
 # (2) "tropical"
 # (3) "temperate"
-sub <- NA
+sub <- "temperate"
 
 # select one to run analysis for checking
 # (1) NA for actual analysis
 # (2) "sampling_biases" to test for sampling bias in results
 # (3) "species_continuity" to test only species tested in both time periods
-testv <- "species_continuity"
+testv <- NA
 
 ## end of command line variables
 
@@ -224,10 +224,9 @@ if (!is.na(sub)) {
 
 print("Running plots script...")
 # run script to plot line graphs and pie charts
-#source(paste0(scripts_path, "plots.R"))
+source(paste0(scripts_path, "plots.R"))
 
 # this script formats the user input variables for the main script
-# by subsetting dataset by specified variables and creating output directories
 print("Running set up script...")
 source(paste0(scripts_path, "analysis_prep.R"))
        
