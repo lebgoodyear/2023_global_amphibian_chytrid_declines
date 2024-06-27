@@ -5,11 +5,11 @@
 
 # Author: Luke Goodyear (lgoodyear01@qub.ac.uk)
 # Date created: Dec 2023
-# Last edited: Jan 2024
+# Last edited: Jun 2024
 
 
-# only run if subsetting is required
-if (!is.na(sub)){
+# only run if testing is required
+if (!is.na(testv)){
   
   ##############################################################################
   ############################# Biases in sampling #############################
@@ -19,12 +19,38 @@ if (!is.na(sub)){
   # when to look?
   
   
-  if (sub == "sampling_biases") {
+  if (testv == "sampling_biases") {
     # read in different dataset corresponding to splitting the dataset by year 
     # (partitioning data completely by time, i.e. not cumulative)
     df <- read.csv(paste0(data_path, "iucn_olson_dataset_231123_sampling_biases.csv"))
   }
+
   
+  ##############################################################################
+  ################ Using the same species in both time periods #################
+  
+  
+  ### Analysis on same species for all analysis to account for 'susceptibility' bias
+  
+  
+  if (testv == "species_continuity") {
+    # subset 2020 dataset to include only those species present in the 2004 dataset
+    df_sub <- df[which(!is.na(df$Bd2004)),]
+    df_sub <- df_sub[which(!is.na(df_sub$RL2004)),]
+    # subset 2004 dataset by removing any NA in RL2020 (since this has more NAs than RL2004)
+    df_sub <- df_sub[which(!is.na(df_sub$RL2020)),]
+    # remove unwanted/undefined variables
+    df_sub <- df_sub[which(!(df_sub$RL2004 %in% to_remover)),]
+    df_sub <- df_sub[which(!(df_sub$RL2020 %in% to_remover)),]
+    
+    #data <- df_sub
+    df <- df_sub
+  }
+}
+
+
+# only run if subsetting is required
+if (!is.na(sub)){
   
   ##############################################################################
   ########################### Tropical/temperate ###############################
@@ -54,28 +80,6 @@ if (!is.na(sub)){
       df_temp <- df[which(df$Climate=="Temperate"),]
       df <- df_temp
     }
-  }
-  
-  
-  ##############################################################################
-  ################ Using the same species in both time periods #################
-  
-  
-  ### Analysis on same species for all analysis to account for 'susceptibility' bias
-  
-  
-  if (sub == "species_continuity") {
-    # subset 2020 dataset to include only those species present in the 2004 dataset
-    df_sub <- df[which(!is.na(df$Bd2004)),]
-    df_sub <- df_sub[which(!is.na(df_sub$RL2004)),]
-    # subset 2004 dataset by removing any NA in RL2020 (since this has more NAs than RL2004)
-    df_sub <- df_sub[which(!is.na(df_sub$RL2020)),]
-    # remove unwanted/undefined variables
-    df_sub <- df_sub[which(!(df_sub$IUCNcat2004 %in% to_remover)),]
-    df_sub <- df_sub[which(!(df_sub$IUCNcat2020 %in% to_remover)),]
-    
-    #data <- df_sub
-    df <- df_sub
   }
 }
 

@@ -25,7 +25,7 @@ print("Reading in user inputs...")
 dater <- "240117" #"231123" #"230724" # note that sampling bias analysis will always 
 # run on 231123, regardless of dater value
 # date corresponding to today (day of running)
-datt <- "240429" #240208" #231123a"#"230905"
+datt <- "240625a" #"240429"
 
 # set path in which to save output subdirectories
 output_dir_core <- paste0("~/Documents/scripts/2023_global_amphibian_chytrid_declines/outputs/", datt,"/")
@@ -57,11 +57,15 @@ resp <- "StatusChangeRL2004to2020"
 
 # select one of the following if subset is being run
 # (1) NA to run full dataset
-# (2) "sampling_biases"
-# (3) "tropical"
-# (4) "temperate"
-# (5) "species_continuity"
-sub <- "temperate"
+# (2) "tropical"
+# (3) "temperate"
+sub <- NA
+
+# select one to run analysis for checking
+# (1) NA for actual analysis
+# (2) "sampling_biases" to test for sampling bias in results
+# (3) "species_continuity" to test only species tested in both time periods
+testv <- "species_continuity"
 
 ## end of command line variables
 
@@ -120,7 +124,7 @@ if (length(args) > 0) { # check to see if running from command line
 # settings for variable groups
 if (resp %in% c("RL2004", "RL2020")) {
   # set any unwanted/undefined variables to be removed
-  to_remover <- c("EW","EX") # remove extinct and extinct in wild
+  to_remover <- c(6,7) # remove extinct and extinct in wild
   # specify variable/s of interest, varr_int, so that new binary column will be 
   # 'yes' (1) if equal to this variable/s and 'no' (0) otherwise
   varr_int <- c(3,4,5)
