@@ -28,7 +28,7 @@ All Bd detections records (not merged at species level) for detections before or
 
 All Bd detections records (not merged at species level) for detections before or during 2020. This dataset is only used to generate maps.
 
-Since analysis using following datasets was not included in the paper, they are not availe on figshare but can be requested from the authors.
+Since analysis using following datasets was not included in the paper, they are not available on figshare but can be requested from the authors:
 
 5. **iucn_olson_dataset_231123_sampling_biases.csv**
 
