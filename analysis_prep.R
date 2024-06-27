@@ -36,16 +36,6 @@ if (length(setdiff(df[[resp]], c(0, 1))) != 0) {
   }
 }
 
-# if predictor column is not already a binary column, convert it to one
-if (length(setdiff(df[[varp]], c(0, 1))) != 0) {
-  if (!is.null(to_removep)) {
-    print("Removing undesginated entries from predictor...")
-    df <- df[!(df[[varp]] %in% to_removep),]
-  }
-  print("Setting up new binary column variable for predictor...")
-  df <- make_new_col(df, varp, varp, varp_int)
-}
-
 # make sure both columns are numeric
 df[[varr]] <- as.numeric(df[[varr]])
 df[[varp]] <- as.numeric(df[[varp]])
