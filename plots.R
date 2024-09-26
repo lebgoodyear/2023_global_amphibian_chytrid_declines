@@ -6,7 +6,7 @@
 
 # Author: Luke Goodyear (lgoodyear01@qub.ac.uk)
 # Date created: Jan 2023
-# Last edited: Jan 2024
+# Last edited: Sept 2024
 
 
 ############################################################################
@@ -45,6 +45,9 @@ prep <- function(df, bd) {
   } else {
     df1980 <- df
   }
+  if (bd=="all") {
+    df1980 <- df1980[which(!is.na(df1980$Bd1980)),]
+  }
   if (bd==1) {
     df1980 <- df1980[which(df1980$Bd1980 == 1),]
   }
@@ -58,6 +61,9 @@ prep <- function(df, bd) {
   } else {
     df2004 <- df
   }
+  if (bd=="all") {
+    df2004 <- df2004[which(!is.na(df2004$Bd2004 == 1)),]
+  }
   if (bd==1) {
     df2004 <- df2004[which(df2004$Bd2004 == 1),]
   }
@@ -70,6 +76,9 @@ prep <- function(df, bd) {
     df2020 <- df[-which(df$RL2020 %in% to_remove),]
   } else {
     df2020 <- df
+  }
+  if (bd=="all") {
+    df2020 <- df2020[which(!is.na(df2020$Bd2020 == 1)),]
   }
   if (bd==1) {
     df2020 <- df2020[which(df2020$Bd2020 == 1),]
@@ -105,9 +114,9 @@ prep <- function(df, bd) {
   return(list(dat, dat_prop, count_comparison, df2004p))
 }
 
-# plot all species
+# plot all species by proportion
 dfall <- prep(df, bd=0) # doesn't matter what bd is set to in this case
-allplot <- ggplot(data=dfall[[2]], aes(x=Year, y=value)) +
+allplot_prop <- ggplot(data=dfall[[2]], aes(x=Year, y=value)) +
             geom_smooth(aes(color=variable)) +
             scale_color_manual(values=c("#003C86", "#3487A5", "#12BFA2", "#E8D91C", "#DA4409")) +
             guides(color=guide_legend(override.aes=list(fill=NA))) +
@@ -115,23 +124,68 @@ allplot <- ggplot(data=dfall[[2]], aes(x=Year, y=value)) +
             theme(legend.title = element_text(size = 10),
                   legend.text = element_text(size = 10))
 
-# plot Bd positive only species
-dfbd <- prep(df, bd=1) # set bd to one for only bd positive species
-bdplot <- ggplot(data=dfbd[[2]], aes(x=Year, y=value)) +
+# plot all species by count
+dfall <- prep(df, bd=0) # doesn't matter what bd is set to in this case
+allplot_count <- ggplot(data=dfall[[1]], aes(x=Year, y=value)) +
+            geom_smooth(aes(color=variable)) +
+            scale_color_manual(values=c("#003C86", "#3487A5", "#12BFA2", "#E8D91C", "#DA4409")) +
+            guides(color=guide_legend(override.aes=list(fill=NA))) +
+            labs(x="", y="Number of species", color="IUCN Red List category") +
+            theme(legend.title = element_text(size = 10),
+                  legend.text = element_text(size = 10))
+
+# plot only species tested for Bd (by proportion)
+dfbd_tested <- prep(df, bd="all") # set bd to one for only bd positive species
+bdplot_tested_prop <- ggplot(data=dfbd_tested[[2]], aes(x=Year, y=value)) +
             geom_smooth(aes(color=variable)) +
             scale_color_manual(values=c("#003C86", "#3487A5", "#12BFA2", "#E8D91C", "#DA4409")) +
             guides(color=guide_legend(override.aes=list(fill=NA))) +
             labs(x="", y="Proportion of species", color="IUCN Red List category") +
+            theme(legend.title = element_text(size = 10),
+                  legend.text = element_text(size = 10))
+
+# plot only species tested for Bd (by count)
+dfbd_tested <- prep(df, bd="all") # set bd to one for only bd positive species
+bdplot_tested_count <- ggplot(data=dfbd_tested[[1]], aes(x=Year, y=value)) +
+            geom_smooth(aes(color=variable)) +
+            scale_color_manual(values=c("#003C86", "#3487A5", "#12BFA2", "#E8D91C", "#DA4409")) +
+            guides(color=guide_legend(override.aes=list(fill=NA))) +
+            labs(x="", y="Number of species", color="IUCN Red List category") +
+            theme(legend.title = element_text(size = 10),
+                  legend.text = element_text(size = 10))
+
+# plot Bd positive only species by proportion
+dfbd <- prep(df, bd=1) # set bd to one for only bd positive species
+bdplot_prop <- ggplot(data=dfbd[[2]], aes(x=Year, y=value)) +
+            geom_smooth(aes(color=variable)) +
+            scale_color_manual(values=c("#003C86", "#3487A5", "#12BFA2", "#E8D91C", "#DA4409")) +
+            guides(color=guide_legend(override.aes=list(fill=NA))) +
+            labs(x="", y="Proportion of species", color="IUCN Red List category") +
+            theme(legend.title = element_text(size = 10),
+                  legend.text = element_text(size = 10))
+
+# plot Bd positive only species by count
+dfbd <- prep(df, bd=1) # set bd to one for only bd positive species
+bdplot_count <- ggplot(data=dfbd[[1]], aes(x=Year, y=value)) +
+            geom_smooth(aes(color=variable)) +
+            scale_color_manual(values=c("#003C86", "#3487A5", "#12BFA2", "#E8D91C", "#DA4409")) +
+            guides(color=guide_legend(override.aes=list(fill=NA))) +
+            labs(x="", y="Number of species", color="IUCN Red List category") +
             theme(legend.title = element_text(size = 10),
                   legend.text = element_text(size = 10))
 
 # save both plots
-ggsave(paste0(path_plots, "rlcats_1980-2020.png"), allplot)
-ggsave(paste0(path_plots, "bdrlcats_1980-2020.png"), bdplot)
+ggsave(paste0(path_plots, "rlcats_1980-2020_prop.png"), allplot_prop)
+ggsave(paste0(path_plots, "rlcats_1980-2020_count.png"), allplot_count)
+ggsave(paste0(path_plots, "bd_tested_rlcats_1980-2020_prop.png"), bdplot_tested_prop)
+ggsave(paste0(path_plots, "bd_tested_rlcats_1980-2020_count.png"), bdplot_tested_count)
+ggsave(paste0(path_plots, "bdpos_rlcats_1980-2020_prop.png"), bdplot_prop)
+ggsave(paste0(path_plots, "bdpos_rlcats_1980-2020_count.png"), bdplot_count)
 
 # save breakdown
-write.csv(as.data.frame(dfall[[1]]), paste0(path_plots, "category_breakdowns_over_time.csv"))
-write.csv(as.data.frame(dfbd[[1]]), paste0(path_plots, "category_bdpos_breakdowns_over_time.csv"))
+write.csv(as.data.frame(dfall[[1]]), paste0(path_plots, "category_breakdowns_over_time_count.csv"))
+write.csv(as.data.frame(dfbd_tested[[1]]), paste0(path_plots, "category_bd_tested_breakdowns_over_time_count.csv"))
+write.csv(as.data.frame(dfbd[[1]]), paste0(path_plots, "category_bdpos_breakdowns_over_time_count.csv"))
 
 
 ############################################################################
@@ -238,18 +292,6 @@ pie_bd1980$Bd1980 <- factor(pie_bd1980$Bd1980, levels=c("1", "0", "No data"))
 bd_plot1980 <- plot_pies(pie_bd1980, "Test Results for Bd (1980)", "Bd1980", c("Bd detected", "Bd not detected", "No data"))
 bd_plot1980
 write.csv(pie_bd1980, paste0(path_plots, "Test Results for Bd (1980).csv"))
-
-
-# split data by IUCN declines and save as pie chart
-# set NAs to 'No data' so they plot on pie chart
-dfa$PopTrend2020[which(is.na(dfa$PopTrend2020))] <- "No data"
-dfa$PopTrend2020[which(dfa$PopTrend2020 == 1)] <- 0
-pie_pop <- as.data.frame(table(dfa$PopTrend2020))
-names(pie_pop) <- c("PopTrend", "Frequency")
-# set order of groups in pie chart plot
-pie_pop$PopTrend <- factor(pie_pop$PopTrend, levels=c("-1", "0", "No data"))
-pop_plot <- plot_pies(pie_pop, "Population Trend (2020)", "PopTrend", c("Declining", "Stable or increasing", "No data"))
-pop_plot
 
 
 # split data by IUCN category worsening 1980-2004 and save as pie chart
