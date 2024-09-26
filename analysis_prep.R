@@ -5,15 +5,7 @@
 
 # Author: Luke Goodyear (lgoodyear01@qub.ac.uk)
 # Date created: Dec 2022
-# Last edited: Jun 2024
-
-
-############################################################################
-######################### Load prep functions ##############################
-
-
-print("Loading functions...")
-source(paste0(scripts_path, "functions.R"))
+# Last edited: Sept 2024
 
 
 ############################################################################
