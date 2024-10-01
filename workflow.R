@@ -8,7 +8,7 @@
 # Last edited: Sept 2024
 
 # clear workspace
-rm(list=ls())
+rm(list = ls())
 
 
 ################################################################################
@@ -22,17 +22,17 @@ print("Reading in user inputs...")
 
 
 ## date corresponding to dataset
-dater <- "240117" # note that sampling bias analysis will always 
+dater <- "240117" # note that sampling bias analysis will always
 # run on 231123, regardless of dater value
 # date corresponding to today (day of running)
 datt <- date <- Sys.Date() #"240625" #"240429"
 
 # set path in which to save output subdirectories
-output_dir_core <- paste0("~/Documents/scripts/2023_global_amphibian_chytrid_declines/outputs/", datt,"/")
+output_dir_core <- paste0("~/Documents/scripts/2023_global_amphibian_chytrid_declines/outputs/", datt, "/")
 
 # path to scripts and data
-scripts_path <- "~/Documents/scripts/2023_global_amphibian_chytrid_declines/" 
-data_path <- "~/Documents/scripts/2023_global_amphibian_chytrid_declines/data/" 
+scripts_path <- "~/Documents/scripts/2023_global_amphibian_chytrid_declines/"
+data_path <- "~/Documents/scripts/2023_global_amphibian_chytrid_declines/data/"
 
 # read in phylogeny
 library("ape")
@@ -59,14 +59,14 @@ resp <- "StatusChangeRL2004to2020"
 # (1) NA to run full dataset
 # (2) "tropical"
 # (3) "temperate"
-sub <- "tropical"
+sub <- "temperate"
 
 # select one to run analysis for checking
 # (1) NA for actual analysis
 # (2) "sampling_biases" to test for sampling bias in results
 # (3) "species_continuity" to test only species tested in both time periods
 sampling_biases <- FALSE
-species_continuity <- FALSE
+species_continuity <- TRUE
 
 ## end of command line variables
 
@@ -107,12 +107,12 @@ iter_phylo <- 5000
 #!/usr/bin/env Rscript
 # set up to accept arguments from command
 # load arguments from command line
-args <- commandArgs(trailingOnly=TRUE)
+args <- commandArgs(trailingOnly = TRUE)
 # load arguments into script as required variable names
 if (length(args) > 0) { # check to see if running from command line
   resp <- args[1]
   sub <- args[2]
-} 
+}
 
 
 ################################################################################
@@ -125,13 +125,13 @@ if (length(args) > 0) { # check to see if running from command line
 # settings for variable groups
 if (resp %in% c("RL2004", "RL2020")) {
   # set any unwanted/undefined variables to be removed
-  to_remover <- c(6,7) # remove extinct and extinct in wild
-  # specify variable/s of interest, varr_int, so that new binary column will be 
+  to_remover <- c(6, 7) # remove extinct and extinct in wild
+  # specify variable/s of interest, varr_int, so that new binary column will be
   # 'yes' (1) if equal to this variable/s and 'no' (0) otherwise
-  varr_int <- c(3,4,5)
+  varr_int <- c(3, 4, 5)
   # for contingency tables and mosaic plots
   # names for response labels
-  key_name <- "Threatened status" 
+  key_name <- "Threatened status"
   varr_int_name <- "Threatened"  # corresponding to 1 factor level
   varr_other_name <- "Not threatened" # corresponding to 0 factor level
 } else if (resp %in% c("StatusChangeRL1980to2004", "StatusChangeRL2004to2020")) {
@@ -139,7 +139,7 @@ if (resp %in% c("RL2004", "RL2020")) {
   to_remover <- c("EX") # remove stable extinct for category change
   # resp is already a binary column so we do not need to specify
   # the variables of interest
-  varr_int <- NULL 
+  varr_int <- NULL
   # for contingency tables and mosaic plots
   # names for response labels
   key_name <- "Category worsened"
@@ -153,13 +153,13 @@ if (resp %in% c("RL2004", "RL2020")) {
 
 # settings for individual response variables
 if (resp == "RL2004") {
-  # name of new binary column 
+  # name of new binary column
   varr <- "Threatened2004"
   # set predictor column to Bd detections for correct year (matching response)
   varp <- "Bd2004"
 }
 if (resp == "RL2020") {
-  # name of new binary column 
+  # name of new binary column
   varr <- "Threatened2020"
   # set predictor column to Bd detections for correct year (matching response)
   varp <- "Bd2020"
@@ -205,46 +205,46 @@ source(paste0(scripts_path, "subsetting.R"))
 
 # set output directory name for chosen hyperparameters
 if (!is.na(sub)) {
-  if ((sampling_biases == TRUE) & (species_continuity == TRUE)) {
-    directory_name <-paste0(output_dir_core, sub, "/sampling_biases/species_continuity/", resp, "_", varp, "/")
+  if ((sampling_biases == TRUE) && (species_continuity == TRUE)) {
+    directory_name <- paste0(output_dir_core, sub, "/sampling_biases/species_continuity/", resp, "_", varp, "/")
     path_base <- paste0(output_dir_core, sub, "/sampling_biases/species_continuity/")
     path_out <- paste0(path_base, resp, "_", varp, "/")
   } else if (sampling_biases == TRUE) {
-    directory_name <-paste0(output_dir_core, sub, "/sampling_biases/", resp, "_", varp, "/")
+    directory_name <- paste0(output_dir_core, sub, "/sampling_biases/", resp, "_", varp, "/")
     path_base <- paste0(output_dir_core, sub, "/sampling_biases/")
     path_out <- paste0(path_base, resp, "_", varp, "/")
   } else if (species_continuity == TRUE) {
-    directory_name <-paste0(output_dir_core, sub, "/species_continuity/", resp, "_", varp, "/")
-      path_base <- paste0(output_dir_core, sub, "/species_continuity/")
+    directory_name <- paste0(output_dir_core, sub, "/species_continuity/", resp, "_", varp, "/")
+    path_base <- paste0(output_dir_core, sub, "/species_continuity/")
     path_out <- paste0(path_base, resp, "_", varp, "/")
   } else {
-    directory_name <-paste0(output_dir_core, sub, "/", resp, "_", varp, "/")
+    directory_name <- paste0(output_dir_core, sub, "/", resp, "_", varp, "/")
     path_base <- paste0(output_dir_core, sub, "/")
     path_out <- paste0(path_base, resp, "_", varp, "/")
   }
 } else {
-    if ((sampling_biases == TRUE) & (species_continuity == TRUE)) {
-    directory_name <-paste0(output_dir_core, "/sampling_biases/species_continuity/", resp, "_", varp, "/")
+  if ((sampling_biases == TRUE) && (species_continuity == TRUE)) {
+    directory_name <- paste0(output_dir_core, "/sampling_biases/species_continuity/", resp, "_", varp, "/")
     path_base <- paste0(output_dir_core, "/sampling_biases/species_continuity/")
     path_out <- paste0(path_base, resp, "_", varp, "/")
   } else if (sampling_biases == TRUE) {
-    directory_name <-paste0(output_dir_core, "/sampling_biases/", resp, "_", varp, "/")
+    directory_name <- paste0(output_dir_core, "/sampling_biases/", resp, "_", varp, "/")
     path_base <- paste0(output_dir_core, "/sampling_biases/")
     path_out <- paste0(path_base, resp, "_", varp, "/")
   } else if (species_continuity == TRUE) {
-    directory_name <-paste0(output_dir_core, "/species_continuity/", resp, "_", varp, "/")
+    directory_name <- paste0(output_dir_core, "/species_continuity/", resp, "_", varp, "/")
     path_base <- paste0(output_dir_core, "/species_continuity/")
     path_out <- paste0(path_base, resp, "_", varp, "/")
   } else {
-    directory_name <-paste0(output_dir_core, "/", resp, "_", varp, "/")
+    directory_name <- paste0(output_dir_core, "/", resp, "_", varp, "/")
     path_base <- paste0(output_dir_core, "/")
     path_out <- paste0(path_base, resp, "_", varp, "/")
   }
 }
 # check if results directory exists and if not, create it
 ifelse(!dir.exists(file.path(directory_name)),
-        dir.create(file.path(directory_name), recursive=T), 
-        FALSE)
+       dir.create(file.path(directory_name), recursive = TRUE),
+       FALSE)
 
 
 ################################################################################
@@ -266,19 +266,20 @@ source(paste0(scripts_path, "plots.R"))
 
 print("Running descriptive analysis script...")
 # run script to look at data breakdowns
+# note this must be run before analysis_prep.R since it uses full dataset
 source(paste0(scripts_path, "descriptive_analysis.R"))
 
 # this script formats the user input variables for the main script
 print("Running set up script...")
 source(paste0(scripts_path, "analysis_prep.R"))
-       
+
 print("Running main script...")
 # run script with frequentist stats
 source(paste0(scripts_path, "main.R"))
 
 print("Running phylogeny-specific script...")
 # run script with bayes models
-#source(paste0(scripts_path, "main_bayes.R"))
+source(paste0(scripts_path, "main_bayes.R"))
 
 
 print("Script finished.")
