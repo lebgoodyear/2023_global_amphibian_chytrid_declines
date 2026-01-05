@@ -1,12 +1,15 @@
-# <ins>Fungal panzootic continues to threaten temperate but not tropical amphibian biodiversity </ins>
+# <ins>Global Amphibian Chytrid Declines</ins>
 
-### Descriptions of all datasets and code required to reproduce the analysis and plots for Goodyear et al. "Fungal panzootic continues to threaten temperate but not tropical amphibian biodiversity". (2024). 
+### Descriptions of all datasets and code required to reproduce the analysis and plots for Goodyear et al. "Fungal panzootic increasingly threatens temperate amphibian species while impact has stabilised in equatorial regions" (2026).
 
 &nbsp;
 
 ## <ins>Datasets</ins>
 
-1. **iucn_olson_dataset_240117.csv** 
+### Main dataset
+
+Dataset for analysis performed in published article can be found here:
+https://doi.org/10.6084/m9.figshare.24088470
 
 This is the main dataset used for analysis and is a concatentation of the following datasets: 
 
@@ -16,29 +19,29 @@ This is the main dataset used for analysis and is a concatentation of the follow
 
 (3) Backcast IUCN Red List categories provided by Luedtke, J.A., Chanson, J., Neam, K. et al. Ongoing declines for the world’s amphibians in the face of emerging threats. Nature 622, 308–314 (2023).
 
-2. **olson1980_all_fields_230724.csv**
+### Additional datasets
+
+1. **olson1980_all_fields_230724.csv**
 
 All Bd detections records (not merged at species level) for detections before or during 1980. This dataset is only used to generate maps.
 
-3. **olson2004_all_fields_230724.csv**
+2. **olson2004_all_fields_230724.csv**
 
 All Bd detections records (not merged at species level) for detections before or during 2004. This dataset is only used to generate maps.
 
-4. **olson2020_all_fields_230724.csv**
+3. **olson2020_all_fields_230724.csv**
 
 All Bd detections records (not merged at species level) for detections before or during 2020. This dataset is only used to generate maps.
 
-Since analysis using following datasets was not included in the paper, they are not available on figshare but can be requested from the authors:
-
-5. **iucn_olson_dataset_231123_sampling_biases.csv**
+4. **iucn_olson_dataset_231123_sampling_biases.csv**
 
 Same as dataset 1, except Bd infection status is calculated separately for each 
 time period (i.e. Bd tests between 1980 and 2004 are not used to calculate 
 Bd infection status for 2004 to 2020).
 
-6. **amphibia_nexus_spp.txt**
+5. **amphibia_nexus_spp.txt**
 
-Amphibian phylogenetic tree from Jetz, W. & Alexander Pyron, R. "The interplay of past diversification and evolutionary isolation with present imperilment across the amphibian tree of life". Nat Ecol Evol 2(5), 850–858 (2018).
+Amphibian phylogenetic tree from Jetz, W. & Alexander Pyron, R. "The interplay of past diversification and evolutionary isolation with present imperilment across the amphibian tree of life". Nat Ecol Evol 2(5), 850–858 (2018). Required only for the phylogenetic analysis.
 
 &nbsp;
 
